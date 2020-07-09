@@ -307,6 +307,9 @@ setup Minio in a K8 cluster using the Bitnami distribution.
 Alternatively
 > pks get-kubeconfig <cluster> -a <pks api> -u <user> -p <password> -k
 > E.g.
+> pks login -a pks.corp.local -u riaz -p VMware1! -k
+> pks get-credentials infra-cluster
+> Alternatively
 > pks get-kubeconfig infra-cluster -a pks.corp.local -u riaz -p VMware1! -k
 
 
@@ -366,8 +369,7 @@ Storage class definition when using a CSI driver
 >
 > parameters:
 >
-> datastoreurl:
-> \"ds:///vmfs/volumes/5cef81a9-a9328547-8d05-00505601dfda/\"
+> datastoreurl: "ds:///vmfs/volumes/5cef81a9-a9328547-8d05-00505601dfda/\"
 >
 Datastore url can be obtained from vCenter
 
@@ -457,14 +459,13 @@ release link 'Copy Link address'
 
 **Step 3**: Download and uncompress the Velero distribution
 
-mkdir velero
+> mkdir velero
 
-cd \~/velero
+> cd \~/velero
 
-wget
-<https://github.com/vmware-tanzu/velero/releases/download/v1.4.0/velero-v1.4.0-linux-amd64.tar.gz>
+> wget <https://github.com/vmware-tanzu/velero/releases/download/v1.4.0/velero-v1.4.0-linux-amd64.tar.gz>
 
-tar xvf velero-v1.4.0-linux-amd64.tar.gz
+> tar xvf velero-v1.4.0-linux-amd64.tar.gz
 
 Install Velero
 --------------
@@ -483,34 +484,38 @@ ci-cluster as our source cluster.
 
 **Step 2:** Get kube config for the source cluster:
 
-pks get-kubeconfig \<source-cluster\> -a \<pks api\> -u \<user\> -p
+> pks login -a <pks api> -u <user> -p <password> -k
+> pks get-credentials <cluster> 
+
+Alternatively 
+> pks get-kubeconfig \<source-cluster\> -a \<pks api\> -u \<user\> -p
 \<password\> -k
 
-E.g.
+> E.g.
+> pks login -a pks.corp.local -u riaz -p VMware1! -k
+> pks get-credentials ci-cluster
+Alternatively
+> pks get-kubeconfig ci-cluster -a pks.corp.local -u riaz -p VMware1! -k
 
-pks get-kubeconfig ci-cluster -a pks.corp.local -u riaz -p VMware1! -k
-
-![](./media/image14.png){width="7.0in" height="0.8006944444444445in"}
+![](./media/image14.png)
 
 **Step 3:** Create a namespace for Velero, called velero:
 
-kubectl create ns velero
+> kubectl create ns velero
 
 **Step 4:** Change directory to the velero directory:
 
-cd \~/velero/velero-v1.4.0-linux-amd64
+> cd \~/velero/velero-v1.4.0-linux-amd64
 
 **Step 5:** Create a credentials file, and name it credentials. This
 will contain the username and password used for Minio. The values would
 be the same as what was provided during the Minio setup.
 
-\[default\]
+> \[default\]
+> aws\_access\_key\_id = minio
+> aws\_secret\_access\_key = minio123
 
-aws\_access\_key\_id = minio
-
-aws\_secret\_access\_key = minio123
-
-NOTE: This file can be deleted once the Velero is installed to the
+Note: This file can be deleted once the Velero is installed to the
 cluster.
 
 **Step 6:** Set kubectl context to the source cluster
@@ -565,47 +570,39 @@ E.g.
 >
 > \--plugins velero/velero-plugin-for-aws:v1.1.0
 
-![A close up of text on a black background Description automatically
-generated](./media/image15.png){width="6.319444444444445in"
-height="4.986111111111111in"}
+![](./media/image15.png)
 
 **Step 8:** Get status of pods in the velero namespace
 
-kubectl get po -n velero
+> kubectl get po -n velero
 
 **Step 9:** If the Restic pods fails to startup, we will need to edit
 the hostPath for the Restic pods.
 
-kubectl edit daemonset restic -n velero
+> kubectl edit daemonset restic -n velero
 
 change hostPath from /var/lib/kubelet/pods to
-/var/vcap/data/kubelet/pods:
+> /var/vcap/data/kubelet/pods:
 
 Which will look like below
 
--hostPath:
+> -hostPath:
+>    path: /var/vcap/data/kubelet/pods
 
-path: /var/vcap/data/kubelet/pods
+![](./media/image16.png)
 
-![A screenshot of a cell phone Description automatically
-generated](./media/image16.png){width="7.727287839020122in"
-height="4.859971566054243in"}
-
-![A screenshot of a cell phone Description automatically
-generated](./media/image17.png){width="7.5in" height="1.14375in"}
+![](./media/image17.png)
 
 **Step 10:** Get all the plugins in velero
 
-./velero plugin get
+> ./velero plugin get
 
-![A screenshot of a cell phone Description automatically
-generated](./media/image18.png){width="3.9444444444444446in"
-height="2.263888888888889in"}
+![](./media/image18.png)
 
 Note: The AWS and restic plugins installed in the previous step is
 listed.
 
-**\
+
 Step 11:** Install the Velero Plugin for vSphere. This plugin is an
 alternate to Restic and enables Velero to take crash-consistent snapshot
 backup of a block Persistent Volume on vSphere storage and backup of
@@ -630,8 +627,8 @@ cluster you before creating the storage class.
 
 NOTE: Make sure that the csi-vsphere.conf file has the correct values
 
-\[Global\]
-
+>\[Global\]
+>
 > cluster-id = \<cluster-name\>
 >
 > \[VirtualCenter \"\<vcenter-ip\>\"\]
@@ -666,20 +663,16 @@ NOTE: Make sure that the csi-vsphere.conf file has the correct values
 
 **Step 13:** Install the velero vsphere plugin
 
-./velero plugin add vsphereveleroplugin/velero-plugin-for-vsphere:1.0.1
+> ./velero plugin add vsphereveleroplugin/velero-plugin-for-vsphere:1.0.1
 
 **Step 14:** Verify if the velero vsphere plugin has been installed
 
-./velero plugin get
+> ./velero plugin get
 
-![A screenshot of a cell phone Description automatically
-generated](./media/image19.png){width="4.180555555555555in"
-height="2.361111111111111in"}
+![](./media/image19.png)
 
 **Note :** The vsphere plugin is listed along with AWS and restic.
 
-**\
-**
 
 **Target Cluster**
 
@@ -691,15 +684,19 @@ restored**.** As mentioned in the assumptions section we will be using
 
 **Step 2:** Get kube config for the target cluster
 
-pks get-kubeconfig \<source-cluster\> -a \<pks api\> -u \<user\> -p
-\<password\> -k
 
-E.g.
+> pks login -a <pks api> -u <user> -p <password> -k
+> pks get-credentials <cluster> 
 
-pks get-kubeconfig my-cluster -a pks.corp.local -u riaz -p VMware1! -k
+Alternatively
+> pks get-kubeconfig <cluster> -a <pks api> -u <user> -p <password> -k
+> E.g.
+> pks login -a pks.corp.local -u riaz -p VMware1! -k
+> pks get-credentials my-cluster
+> Alternatively
+> pks get-kubeconfig my-cluster -a pks.corp.local -u riaz -p VMware1! -k
 
-![](./media/image20.png){width="7.188234908136483in"
-height="0.6784722222222223in"}
+![](./media/image20.png)
 
 **Step 3: Follow steps 3 to 14 in the previous section.**
 
@@ -709,9 +706,9 @@ Uninstall Velero
 To uninstall Velero we will need to delete all the resources associated
 with its install
 
-kubectl delete namespace/velero clusterrolebinding/velero
+> kubectl delete namespace/velero clusterrolebinding/velero
 
-kubectl delete crds -l component=velero
+> kubectl delete crds -l component=velero
 
 Yelb Application 
 ================
@@ -730,18 +727,21 @@ Deploy Yelb
 
 **Step 1:** Get kube config for the source cluster
 
-pks get-kubeconfig \<source-cluster\> -a \<pks api\> -u \<user\> -p
-\<password\> -k
+> pks login -a <pks api> -u <user> -p <password> -k
+> pks get-credentials <cluster>
+>
+> Alternatively
+> pks get-kubeconfig <cluster> -a <pks api> -u <user> -p <password> -k
+> E.g.
+> pks login -a pks.corp.local -u riaz -p VMware1! -k
+> pks get-credentials ci-cluster
+> pks get-kubeconfig ci-cluster -a pks.corp.local -u riaz -p VMware1! -k
 
-E.g.
-
-pks get-kubeconfig ci-cluster -a pks.corp.local -u riaz -p VMware1! -k
-
-![](./media/image14.png){width="7.0in" height="0.8006944444444445in"}
+![](./media/image14.png)
 
 **Step 2:** Set kubectl context to the source cluster
 
-kubectl config use-context \<source-cluster\>
+> kubectl config use-context \<source-cluster\>
 
 > E.g.\
 > kubectl config use-context ci-cluster
@@ -799,19 +799,17 @@ Storage class definition when using a CSI driver
 > datastoreurl:
 > \"ds:///vmfs/volumes/5cef81a9-a9328547-8d05-00505601dfda/\"
 >
-> Datastore url can be obtained from vcenter
->
-> ![A screenshot of a social media post Description automatically
-> generated](./media/image3.png){width="6.811765091863517in"
-> height="3.7916666666666665in"}
+Datastore url can be obtained from vcenter
 
-kubectl apply -f storage-class.yaml
+![](./media/image3.png)
+
+> kubectl apply -f storage-class.yaml
 
 **Step 3**: Create a yelb namespace
 
-kubectl create ns yelb
+> kubectl create ns yelb
 
-![](./media/image21.png){width="7.5in" height="0.4354166666666667in"}
+![](./media/image21.png)
 
 **Step 4:** Create the persistent volume claims required for this
 application. This will create a PVC for the redis-server and the yelb-db
@@ -822,9 +820,9 @@ Copy the contents of the file
 
 to a local file for e.g. yelb-pvc.yaml
 
-kubectl apply -f yelb-pvc.yaml
+> kubectl apply -f yelb-pvc.yaml
 
-![](./media/image22.png){width="7.5in" height="0.44513888888888886in"}
+![](./media/image22.png)
 
 **Step 5:** Deploy the Yelb application, this will create the necessary
 deployments, pods and services and expose the yelb-ui deployment as an
@@ -835,35 +833,29 @@ Copy the contents of the file
 
 file to a local file for e.g. yelb.yaml
 
-kubectl apply -f yelb.yaml
+> kubectl apply -f yelb.yaml
 
-![A screenshot of a cell phone Description automatically
-generated](./media/image23.png){width="7.5in"
-height="1.4618055555555556in"}
+![](./media/image23.png)
 
 **Step 6:** Verify if all the pods are running on the yelb name
 namespace
 
-kubectl get po -n yelb \--watch
+> kubectl get po -n yelb \--watch
 
-![A screenshot of a cell phone Description automatically
-generated](./media/image24.png){width="7.5in"
-height="1.1291666666666667in"}
+![](./media/image24.png)
 
 **Step 7:** Get the loadbalancer ip for the ingress to access the Yelb
 application. The EXTERNAL-IP is the loadbalancer's ip.
 
-kubectl get svc -n yelb
+> kubectl get svc -n yelb
 
-![A screenshot of a cell phone Description automatically
-generated](./media/image25.png){width="5.858823272090989in"
-height="0.8012062554680665in"}
+![](./media/image25.png)
 
 **Step 8:** Access the application by pointing the browser to the ip
 from the previous step
 
-![A screenshot of a social media post Description automatically
-generated](./media/image26.png){width="7.5in" height="4.1875in"}
+![](./media/image26.png)
+
 
 Unistall Yelb 
 -------------
@@ -871,7 +863,7 @@ Unistall Yelb
 To delete the Yelb application and all its associated resources, delete
 the yelb namespace
 
-kubectl delete ns yelb
+> kubectl delete ns yelb
 
 On-demand Backups 
 =================
@@ -909,21 +901,22 @@ etc.
 
 **Step 1:** Get kube config for the source cluster
 
-pks get-kubeconfig \<source-cluster\> -a \<pks api\> -u \<user\> -p
-\<password\> -k
+> pks login -a <pks api> -u <user> -p <password> -k
+> pks get-credentials <cluster>
+>
+> Alternatively
+> pks get-kubeconfig <cluster> -a <pks api> -u <user> -p <password> -k
+> E.g.
+> pks login -a pks.corp.local -u riaz -p VMware1! -k
+> pks get-credentials ci-cluster
+> pks get-kubeconfig ci-cluster -a pks.corp.local -u riaz -p VMware1! -k
 
-E.g.
+![](./media/image14.png)
 
-pks get-kubeconfig ci-cluster -a pks.corp.local -u riaz -p VMware1! -k
-
-![](./media/image14.png){width="7.0in" height="0.8006944444444445in"}
-
-**\
-**
 
 **Step 2:** Set kubectl context to the source cluster
 
-kubectl config use-context \<source-cluster\>
+> kubectl config use-context \<source-cluster\>
 
 > E.g.\
 > kubectl config use-context ci-cluster
@@ -932,24 +925,20 @@ kubectl config use-context \<source-cluster\>
 
 kubectl get ns
 
-![A screenshot of a cell phone Description automatically
-generated](./media/image27.png){width="3.769790026246719in"
-height="1.3888888888888888in"}
+![](./media/image27.png)
 
 NOTE: apart from the default and system namespaces, yelb, x1, y1 and z1
 exist
 
-kubectl get po \--all-namespaces
+> kubectl get po \--all-namespaces
 
-![A close up of text on a white background Description automatically
-generated](./media/image28.png){width="5.648148512685914in"
-height="2.574346019247594in"}
+![](./media/image28.png)
 
 NOTE: Note the pods running in the yelb , x1, y1 and z1 namespaces
 
-kubectl get pv \--all-namespaces
+> kubectl get pv \--all-namespaces
 
-![](./media/image29.png){width="7.5in" height="0.4111111111111111in"}
+![](./media/image29.png)
 
 NOTE: There are a couple of PVs in the yelb namespace (redis and yelb
 database)
@@ -957,17 +946,13 @@ database)
 **Step 4:** Login to the Yelb application and make sure that the
 application is reachable
 
-kubectl get svc -n yelb
+> kubectl get svc -n yelb
 
-![A screenshot of a cell phone Description automatically
-generated](./media/image25.png){width="6.411763998250219in"
-height="0.8768219597550306in"}
+![](./media/image25.png)
 
 Point the browser to the external-ip of yelb-ui service
 
-![A screenshot of a social media post Description automatically
-generated](./media/image30.png){width="6.211763998250219in"
-height="3.4682349081364827in"}
+![](./media/image30.png)
 
 **Step 5:** The Yelb application runs a yelb-db and the redis-server
 pods which are both stateful. All stateful pods need to be annotated.
@@ -984,34 +969,29 @@ Run the following to annotate each pod that contains a volume to back up
 stateful pod and describe it. For eg. in the Yelb deployment is the
 stateful pod
 
-kubectl get po -n yelb
+> kubectl get po -n yelb
 
-![A screenshot of a cell phone Description automatically
-generated](./media/image31.png){width="7.5in" height="1.175in"}
+![](./media/image31.png)
 
 The yelb application has two stateful pods (yelb-db and the
 redis-server)
 
-kubectl describe po yelb-db-0 -n yelb
+> kubectl describe po yelb-db-0 -n yelb
 
-> The volumes associated with this pod is
->
-> Volumes:
->
-> **mysql-persistent-storage:**
->
-> Type: PersistentVolumeClaim (a reference to a PersistentVolumeClaim in
-> the same namespace)
->
-> ClaimName: db-pv-claim
->
-> ReadOnly: false
+The volumes associated with this pod is
 
-![A screenshot of text Description automatically
-generated](./media/image32.png){width="5.164705818022747in"
-height="3.69467738407699in"}
+>Volumes:
+>
+>**mysql-persistent-storage:**
+>
+>Type: PersistentVolumeClaim (a reference to a PersistentVolumeClaim in
+>the same namespace)
+>    ClaimName: db-pv-claim
+>   ReadOnly: false
 
-kubectl describe po redis-server-0 -n yelb
+![](./media/image32.png)
+
+> kubectl describe po redis-server-0 -n yelb
 
 The volumes associated with this pod is
 
@@ -1044,38 +1024,34 @@ restaurants listed. The voting data is persisted in the Yelb database,
 this data will validate the state of the application when restored. Keep
 a tab on the votes.
 
-![A screenshot of a cell phone Description automatically
-generated](./media/image33.png){width="7.5in"
-height="3.845138888888889in"}
+![](./media/image33.png)
 
 Cluster Backup Using the Restic Plugin
 --------------------------------------
 
 **Step 9:** Create a backup all the resources in a cluster
 
-cd \~/velero/velero-v1.4.0-linux-amd64
+> cd \~/velero/velero-v1.4.0-linux-amd64
+>
+> ./velero create backup \<BACKUP NAME\>
+>
+> E.g.
+>
+> ./velero create backup sourceclusterbk
 
-./velero create backup \<BACKUP NAME\>
-
-E.g.
-
-./velero create backup sourceclusterbk
-
-![](./media/image34.png){width="7.5in" height="0.44930555555555557in"}
+![](./media/image34.png)
 
 **Step 10:** Check status of the backup. The output describes the status
 of the backup. We have taken a complete backup and hence all resources
 and PVs are backed up.
 
-./velero backup describe \<BACKUP NAME\>
+> ./velero backup describe \<BACKUP NAME\>
+>
+>**E.g.**
+>
+>./velero backup describe sourceclusterbk
 
-**E.g.**
-
-./velero backup describe sourceclusterbk
-
-![A screenshot of text Description automatically
-generated](./media/image35.png){width="7.167477034120735in"
-height="3.0470581802274714in"}
+![](./media/image35.png)
 
 Note: The restic backups -- these are backups of the pv's in this case
 the yelb-db and redis server
@@ -1088,39 +1064,29 @@ To find the ip of minio check the IP under the "External-IP" section,
 point your browser to the location \<external-ip\>. The Minio
 application should be accessible
 
-kubectl get svc -n minio
+> kubectl get svc -n minio
 
-![](./media/image7.png){width="7.5in" height="0.7111111111111111in"}
+![](./media/image7.png)
 
-![A screenshot of a cell phone Description automatically
-generated](./media/image36.png){width="7.5in"
-height="3.6958333333333333in"}
+![](./media/image36.png)
 
 The backup folder contains the resource backup's and the restic contains
 the persistent volume backup's, the pv backups are referenced within the
 backup.
 
-![A screenshot of a social media post Description automatically
-generated](./media/image37.png){width="7.5in"
-height="2.5652777777777778in"}
+![](./media/image37.png)
 
-![A screenshot of a cell phone Description automatically
-generated](./media/image38.png){width="7.5in" height="3.3375in"}
+![](./media/image38.png)
 
-![A screenshot of a social media post Description automatically
-generated](./media/image39.png){width="7.5in" height="2.16875in"}
+![](./media/image39.png)
 
-![A screenshot of a cell phone Description automatically
-generated](./media/image40.png){width="7.5in"
-height="2.9090277777777778in"}
+![](./media/image40.png)
 
 **Step 12:** Login to the Yelb application and more votes to the
 restaurants listed. The voting data is persisted in the Yelb database,
 this data will validate the state of the application when restored.
 
-![A screenshot of a social media post Description automatically
-generated](./media/image41.png){width="7.5in"
-height="3.4298611111111112in"}
+![](./media/image41.png)
 
 Cluster Backup Using the vSphere plugin
 ---------------------------------------
@@ -1128,38 +1094,35 @@ Cluster Backup Using the vSphere plugin
 **Step 1:** Create a Volume snapshot location. This Volume Snapshot
 location is referenced when a backup is taken
 
-cd \~/velero/velero-v1.4.0-linux-amd64
+> cd \~/velero/velero-v1.4.0-linux-amd64
 
-./velero snapshot-location create vsphere-snap-loc \--provider
+> ./velero snapshot-location create vsphere-snap-loc \--provider
 velero.io/vsphere
 
-![](./media/image42.png){width="7.527777777777778in" height="0.25in"}
+![](./media/image42.png)
 
 **Step 2:** Create a cluster backup
 
 > ./velero backup create srccluster-snap-backup \--snapshot-volumes
 > \--volume-snapshot-locations vsphere-snap-loc
 
-![](./media/image43.png){width="9.194444444444445in"
-height="0.3472222222222222in"}
+![](./media/image43.png)
 
 **Step 3:** Check status of the backup. The output describes the status
 of the backup. We have taken a complete backup and hence all resources
 and PVs are backed up.
 
-./velero backup describe \<BACKUP NAME\>
+> ./velero backup describe \<BACKUP NAME\>
+>
+> For more details on the backup
+>
+> ./velero backup describe \<BACKUP NAME\> \--details
+>
+>**E.g.**
+>
+> ./velero backup describe srccluster-snap-backup
 
-For more details on the backup
-
-./velero backup describe \<BACKUP NAME\> \--details
-
-**E.g.**
-
-./velero backup describe srccluster-snap-backup
-
-![A screenshot of a cell phone Description automatically
-generated](./media/image44.png){width="7.208333333333333in"
-height="4.5in"}
+![](./media/image44.png)
 
 NOTE: Event if the velero backup status shows complete the backup would
 not have been complete. When the vsphere plugin is used there is a lot
@@ -1168,12 +1131,9 @@ a number of operations that occur in Vsphere.
 
 **Step 4:** Monitor the uploads
 
-kubectl -n velero get uploads
+> kubectl -n velero get uploads
 
-![A screenshot of a social media post Description automatically
-generated](./media/image45.png){width="4.694444444444445in"
-height="1.1388888888888888in"}
-
+![](./media/image45.png)
 NOTE: Until the uploads are complete do not perform a restore operation
 
 **Step 5:** Login to Minio and check if the backup and plugins folders
@@ -1183,54 +1143,44 @@ To find the ip of minio check the IP under the "External-IP" section,
 point your browser to the location \<external-ip\>. The Minio
 application should be accessible
 
-kubectl get svc -n minio
+> kubectl get svc -n minio
 
-![](./media/image7.png){width="7.5in" height="0.7111111111111111in"}
+![](./media/image7.png)
 
-![A screenshot of a cell phone Description automatically
-generated](./media/image46.png){width="7.6470581802274715in"
-height="3.7916666666666665in"}
+![](./media/image46.png)
 
-![A screenshot of a social media post Description automatically
-generated](./media/image47.png){width="7.494117454068242in"
-height="4.569444444444445in"}
+![](./media/image47.png)
 
-![A screenshot of a cell phone Description automatically
-generated](./media/image48.png){width="6.891993657042869in"
-height="3.699491469816273in"}
+![](./media/image48.png)
 
-![](./media/image49.png){width="6.986111111111111in"
-height="4.129753937007874in"}
+![](./media/image49.png)
 
 **Step 6:** Login to the Yelb application and more votes to the
 restaurants listed. The voting data is persisted in the Yelb database,
 this data will validate the state of the application when restored.
 
-![A screenshot of a social media post Description automatically
-generated](./media/image41.png){width="7.5in"
-height="3.4298611111111112in"}
+![](./media/image41.png)
+
 
 Namespace Backup Using the Restic Plugin
 ----------------------------------------
 
 **Step 1:** Create a backup of the yelb namespace
 
-cd \~/velero/velero-v1.4.0-linux-amd64
-
-./velero backup create \<BACKUP NAME\> \--include-namespaces
+> cd \~/velero/velero-v1.4.0-linux-amd64
+>
+> ./velero backup create \<BACKUP NAME\> \--include-namespaces
 \<NAMESPACE1\>
-
-E.g.
-
-./velero backup create yelbbkup \--include-namespaces yelb
+>
+> E.g.
+>
+> ./velero backup create yelbbkup \--include-namespaces yelb
 
 **Step 2:** Check status of the backup
 
-./velero backup describe yelbbkup
+> ./velero backup describe yelbbkup
 
-![A screenshot of a cell phone Description automatically
-generated](./media/image50.png){width="5.035294181977253in"
-height="3.8433103674540683in"}
+![](./media/image50.png)
 
 The backup describes the status , the resources etc. In this case as
 shown , only the resources associated with namespace yelb is backed-up.
@@ -1238,8 +1188,7 @@ The Restic backups describe the number of PV's that have been backed up.
 
 **Step 3:** Login to minio and check if the backup has been created.
 
-![A screenshot of a social media post Description automatically
-generated](./media/image51.png){width="7.5in" height="1.7875in"}
+![](./media/image51.png)
 
 **Step 4:** Other options for backup
 
@@ -1257,29 +1206,24 @@ location is referenced when a backup is taken
 NOTE: If a snapshot location has already been created this step is
 optional
 
-cd \~/velero/velero-v1.4.0-linux-amd64
+> cd \~/velero/velero-v1.4.0-linux-amd64
+>
+> ./velero snapshot-location create vsphere-snap-loc \--provider velero.io/vsphere
 
-./velero snapshot-location create vsphere-snap-loc \--provider
-velero.io/vsphere
-
-![](./media/image42.png){width="6.846200787401575in"
-height="0.22736439195100613in"}
+![](./media/image42.png)
 
 **Step 2:** Create a namespace backup
 
-./velero backup create yelb-vspheresnap-bkp \--include-namespaces=yelb
-\--snapshot-volumes \--volume-snapshot-locations vsphere-snap-loc
+> ./velero backup create yelb-vspheresnap-bkp \--include-namespaces=yelb
+> \--snapshot-volumes \--volume-snapshot-locations vsphere-snap-loc
 
-![](./media/image52.png){width="7.4802285651793525in"
-height="0.3472222222222222in"}
+![](./media/image52.png)
 
 **Step 3:** Check status of the backup
 
-./velero backup describe yelb-vspheresnap-bkp --details
+> ./velero backup describe yelb-vspheresnap-bkp --details
 
-![A screenshot of text Description automatically
-generated](./media/image53.png){width="7.633169291338582in"
-height="6.722222222222222in"}
+![](./media/image53.png)
 
 NOTE: Even if the velero backup status shows 'complete', the backup
 would not have been complete. When the vSphere plugin is used there is a
@@ -1289,9 +1233,7 @@ lot of operations that happen in the background (vSphere etc.).
 
 kubectl -n velero get uploads
 
-![A screenshot of a social media post Description automatically
-generated](./media/image54.png){width="4.638888888888889in"
-height="1.3611111111111112in"}
+![](./media/image54.png)
 
 NOTE: Until the uploads are complete do not perform a restore operation
 
@@ -1300,9 +1242,7 @@ related to the backup are running
 
 **Step 6:** Login to Minio and check if the backup exists
 
-![A screenshot of a cell phone Description automatically
-generated](./media/image55.png){width="7.564705818022747in"
-height="3.361111111111111in"}
+![](./media/image55.png)
 
 Scheduled Backups
 =================
@@ -1322,36 +1262,32 @@ recovery use cases.
 restaurants listed. The voting data is persisted in the Yelb database it
 will validate the state of the application when restored.
 
-![A screenshot of a social media post Description automatically
-generated](./media/image56.png){width="7.5in" height="4.0875in"}
+![](./media/image56.png)
 
 **Step 2:** Create a backup scheduler
 
-./velero schedule create \<scheduler-name\> \--schedule
-\<cron-expression\>
-
-E.g.
-
-To create a daily scheduler (use <https://crontab.guru/every-15-minutes>
-for cron expressions if needed)
-
-./velero schedule create daily-scheduler \--schedule=\"\@every 24h\"
-\--ttl 24h0m0s
+> ./velero schedule create \<scheduler-name\> \--schedule
+> \<cron-expression\>
+>
+> E.g.
+>
+> To create a daily scheduler (use <https://crontab.guru/every-15-minutes>
+> for cron expressions if needed)
+> 
+> ./velero schedule create daily-scheduler \--schedule=\"\@every 24h\"
+> \--ttl 24h0m0s
 
 Note: The TTL flag allows the user to specify the backup retention
 period with the value specified in hours, minutes, and seconds in the
 form \--ttl 24h0m0s. 
 
-![](./media/image57.png){width="6.347830271216098in"
-height="0.36470581802274715in"}
+![](./media/image57.png)
 
 **Step 3:** Login to Minio and check if the backup has been created.
 When creating a scheduler, the first backup will be created soon as the
 schedule is submitted.
 
-![A screenshot of a social media post Description automatically
-generated](./media/image58.png){width="7.5in"
-height="2.057638888888889in"}
+![](./media/image58.png)
 
 Note: The state data of the application before each backup was performed
 was as below
@@ -1363,8 +1299,7 @@ Schedule Backup Using the vSphere plugin
 restaurants listed. The voting data is persisted in the Yelb database ,
 this data will validate the state of the application when restored.
 
-![A screenshot of a social media post Description automatically
-generated](./media/image56.png){width="7.5in" height="4.0875in"}
+![](./media/image56.png)
 
 **Step 2:** Create a Volume snapshot location. This Volume Snapshot
 location is referenced when a backup is taken
@@ -1372,42 +1307,39 @@ location is referenced when a backup is taken
 NOTE: If a snapshot location has already been created this step is
 optional
 
-cd \~/velero/velero-v1.4.0-linux-amd64
+> cd \~/velero/velero-v1.4.0-linux-amd64
 
-./velero snapshot-location create vsphere-snap-loc \--provider
-velero.io/vsphere
+> ./velero snapshot-location create vsphere-snap-loc \--provider velero.io/vsphere
 
-![](./media/image42.png){width="7.527777777777778in" height="0.25in"}
+![](./media/image42.png)
 
 **Step 3:** Create a backup scheduler
 
-./velero schedule create \<scheduler-name\> \--schedule
-\<cron-expression\> \--snapshot-volumes \--volume-snapshot-locations
-vsphere-snap-loc
-
-E.g.
-
-To create a daily scheduler (use <https://crontab.guru/every-15-minutes>
-for cron eexpressions if needed)
-
-./velero schedule create daily-scheduler \--schedule=\"\@every 24h\"
-\--ttl 24h0m0s \--snapshot-volumes \--volume-snapshot-locations
-vsphere-snap-loc
+> ./velero schedule create \<scheduler-name\> \--schedule
+> \<cron-expression\> \--snapshot-volumes \--volume-snapshot-locations
+> vsphere-snap-loc
+> 
+> E.g.
+> 
+> To create a daily scheduler (use <https://crontab.guru/every-15-minutes>
+> for cron eexpressions if needed)
+> 
+> ./velero schedule create daily-scheduler \--schedule=\"\@every 24h\"
+> \--ttl 24h0m0s \--snapshot-volumes \--volume-snapshot-locations
+> vsphere-snap-loc
 
 Note: The TTL flag allows the user to specify the backup retention
 period with the value specified in hours, minutes, and seconds in the
 form \--ttl 24h0m0s. 
 
-![](./media/image59.png){width="7.099933289588801in"
-height="0.46805555555555556in"}
+![](./media/image59.png)
+
 
 **Step 4:** Monitor the uploads
 
-kubectl -n velero get uploads
+> kubectl -n velero get uploads
 
-![A screenshot of text Description automatically
-generated](./media/image60.png){width="5.097222222222222in"
-height="1.7361111111111112in"}
+![](./media/image60.png)
 
 **Step 5:** Check vCenter to make sure that none of the operations
 related to the backup are running
@@ -1420,15 +1352,16 @@ a number of operations that occur in Vsphere.
 **Step 6:** Login to Minio and check if the scheduled backup has been
 created
 
-![A screenshot of a cell phone Description automatically
-generated](./media/image61.png){width="7.788234908136483in"
-height="3.0555555555555554in"}
+![](./media/image61.png)
 
-  **Backup Type**    **Votes**   **Outback**   **Buca**   **IHop**   **Chipotle**
-  ------------------ ----------- ------------- ---------- ---------- --------------
-  Full Cluster       15          4 (27%)       3(20%)     5(33%)     3(20%)
-  Namespace          38          12(8%)        8(21%)     14(37%)    4(11%)
-  Scheduled backup   47          17(36%)       8(17%)     18(38%)    4(8.51%)
+ ---------------------------------------------------------------------------------------------
+|   **Backup Type**      | **Votes**  | **Outback**  | **Buca**  | **IHop**  |  **Chipotle**  |
+| ---------------------- | ---------- | ------------ | --------- | --------- | -------------- |
+| Full Cluster           | 15         | 4(27%)       | 3(20%)    | 5(33%)    | 3(20%)         |
+| Namespace              | 38         | 12(8%)       | 8(21%)    | 14(37%)   | 4(11%)         |
+| Scheduled              | 17         | 17(36%)      | 8(17%)    | 18(38%)   | 4(8.51%)       |
+
+
 
 Check Velero documentation <https://velero.io/docs/v1.4/> for other
 options
@@ -1445,12 +1378,15 @@ complete unlike the backup process.
 
 **Step 1:** Get kube config for the source cluster
 
-pks get-kubeconfig \<target-cluster\> -a \<pks api\> -u \<user\> -p
-\<password\> -k
-
-E.g.
-
-pks get-kubeconfig my-cluster -a pks.corp.local -u riaz -p VMware1! -k
+> pks login -a <pks api> -u <user> -p <password> -k
+> pks get-credentials <cluster>
+>
+> Alternatively
+> pks get-kubeconfig <cluster> -a <pks api> -u <user> -p <password> -k
+> E.g.
+> pks login -a pks.corp.local -u riaz -p VMware1! -k
+> pks get-credentials my-cluster
+> pks get-kubeconfig my-cluster -a pks.corp.local -u riaz -p VMware1! -k
 
 **Step 2:** Set kubectl context to the target cluster
 
@@ -1461,11 +1397,9 @@ kubectl config use-context \<target-cluster\>
 
 **Step 3:** Check all resources running on the target cluster
 
-kubectl get ns
+> kubectl get ns
 
-![A screenshot of a cell phone Description automatically
-generated](./media/image62.png){width="3.7222222222222223in"
-height="1.0833333333333333in"}
+![](./media/image62.png)
 
 NOTE: yelb, x1, y1 and z1 namespaces do not exist
 
@@ -1494,12 +1428,11 @@ create the storage class.
 >
 > diskformat: thin
 
-kubectl apply -f storage-class.yaml
+> kubectl apply -f storage-class.yaml
 
-kubectl get sc
+> kubectl get sc
 
-![](./media/image63.png){width="4.95294072615923in"
-height="0.4637587489063867in"}
+![](./media/image63.png)
 
 NOTE: If setting up the storage class using the csi driver , follow the
 steps provided in the VMware Tanzu documentation to set up the CSI
@@ -1529,10 +1462,9 @@ Storage class definition when using a CSI driver
 > datastoreurl:
 > \"ds:///vmfs/volumes/5cef81a9-a9328547-8d05-00505601dfda/\"
 
-kubectl get sc
+> kubectl get sc
 
-![](./media/image64.png){width="3.8333333333333335in"
-height="0.3611111111111111in"}
+![](./media/image64.png)
 
 **Step 5:** Create a Volume snapshot location. (If using the velero
 vsphere plugin)
@@ -1540,12 +1472,12 @@ vsphere plugin)
 NOTE: If a snapshot location has already been created this step is
 optional
 
-cd \~/velero/velero-v1.4.0-linux-amd64
+> cd \~/velero/velero-v1.4.0-linux-amd64
 
-./velero snapshot-location create vsphere-snap-loc \--provider
-velero.io/vsphere
+> ./velero snapshot-location create vsphere-snap-loc \--provider
+> velero.io/vsphere
 
-![](./media/image42.png){width="7.527777777777778in" height="0.25in"}
+![](./media/image42.png)
 
 Restore Namespace Backup
 ------------------------
@@ -1553,37 +1485,32 @@ Restore Namespace Backup
 **Step 6:** Restore the yelb namespace from the yelbbkup created in the
 previous step.
 
-cd \~/velero/velero-v1.4.0-linux-amd64
+> cd \~/velero/velero-v1.4.0-linux-amd64
 
-./velero restore create \--from-backup yelbbkup
+> ./velero restore create \--from-backup yelbbkup
 
 In the above example for vsphere plugin the namespace backup was named
 yelb-vspheresnap-bkp
 
-./velero restore create \--from-backup yelb-vspheresnap-bkp
+> ./velero restore create \--from-backup yelb-vspheresnap-bkp
 
-![](./media/image65.png){width="7.041666666666667in"
-height="0.3333333333333333in"}
+![](./media/image65.png)
 
 **Step 7:** Check the status of the restore in the cluster. The yelb
 namespace should be created and the pods should be up and running. Make
 sure that the pv is also created and bound:
 
-kubectl get ns
+> kubectl get ns
+>
+> kubectl get po -n yelb
+>
+> kubectl get pvc -n yelb
 
-kubectl get po -n yelb
+![](./media/image66.png)
 
-kubectl get pvc -n yelb
+![](./media/image67.png)
 
-![A screenshot of a cell phone Description automatically
-generated](./media/image66.png){width="3.9027777777777777in"
-height="1.1111111111111112in"}
-
-![A screenshot of a cell phone Description automatically
-generated](./media/image67.png){width="4.180555555555555in"
-height="0.6944444444444444in"}
-
-![](./media/image68.png){width="6.652777777777778in" height="0.5in"}
+![](./media/image68.png)
 
 Note: Only the yelb namespace and its resources have been restored
 
@@ -1594,24 +1521,18 @@ before the namespace backup was taken.
 
 kubectl get svc -n yelb
 
-![A screenshot of a cell phone Description automatically
-generated](./media/image69.png){width="6.882352362204724in"
-height="0.9295133420822397in"}
+![](./media/image69.png)
 
-![A screenshot of a social media post Description automatically
-generated](./media/image70.png){width="6.895833333333333in"
-height="3.720138888888889in"}
+![](./media/image70.png)
 
 **Step** **9:** Delete the yelb namespace which will delete the
 application and the PV:
 
-kubectl delete ns yelb
+> kubectl delete ns yelb
 
-kubectl get ns
+> kubectl get ns
 
-![A screenshot of a social media post Description automatically
-generated](./media/image71.png){width="6.629803149606299in"
-height="1.8588232720909885in"}
+![](./media/image71.png)
 
 Restore Cluster Backup
 ----------------------
@@ -1619,67 +1540,55 @@ Restore Cluster Backup
 **Step 10:** Restore the back of all resources from the source cluster
 to the target cluster:
 
-cd \~/velero/velero-v1.4.0-linux-amd64
-
-./velero restore create \--from-backup sourceclusterbk
+> cd \~/velero/velero-v1.4.0-linux-amd64
+>
+> ./velero restore create \--from-backup sourceclusterbk
 
 In the above example for vsphere plugin the namespace backup was named
 yelb-vspheresnap-bkp
 
-./velero restore create \--from-backup srccluster-snap-backup
+> ./velero restore create \--from-backup srccluster-snap-backup
 
-![](./media/image72.png){width="7.5in" height="0.36527777777777776in"}
+![](./media/image72.png)
 
 **Step 11:** Monitor the resources created in the target cluster. The
 yelb , x1, y1 and z1 namespaces should be created. Pods,pv's,
 deployments and services should also be created.
 
-kubectl get ns
+> kubectl get ns
+>
+> kubectl get po \--all-namespaces
+>
+> kubectl get pvc \--all-namespaces
+>
+> kubectl get svc \--all-namespaces
 
-kubectl get po \--all-namespaces
+![](./media/image73.png)
 
-kubectl get pvc \--all-namespaces
+![](./media/image74.png)
 
-kubectl get svc \--all-namespaces
+![](./media/image75.png)
 
-![A screenshot of a cell phone Description automatically
-generated](./media/image73.png){width="5.023529090113736in"
-height="1.8771194225721786in"}
-
-![](./media/image74.png){width="7.5in" height="0.5861111111111111in"}
-
-![A screenshot of a cell phone Description automatically
-generated](./media/image75.png){width="6.138888888888889in"
-height="1.9027777777777777in"}
-
-**\
-**
 
 **Step 12:** Get the external ip for the yelb-ui app
 
-kubectl get svc -n yelb
+> kubectl get svc -n yelb
 
-![A screenshot of a cell phone Description automatically
-generated](./media/image76.png){width="4.805555555555555in"
-height="0.6944444444444444in"}
+![](./media/image76.png)
 
 **Step 13:** Point the browser to it and make sure all the data is
 visible in the application and the application is reachable. Compare the
 voting data recorded in the table before the cluster backup was taken:
 
-![A screenshot of a cell phone Description automatically
-generated](./media/image77.png){width="7.5in"
-height="3.935416666666667in"}
+![](./media/image77.png)
 
 **Step 14:** The x1, y1 and z1 namespaces run nginx pods with busybox.
 The nginx pod running in namespace x1 is exposed as a load balancer. Get
 the external ip to this pod and point the browser to access the service:
 
-![](./media/image78.png){width="4.763888888888889in" height="0.375in"}
+![](./media/image78.png)
 
-![A screenshot of a cell phone Description automatically
-generated](./media/image79.png){width="4.055555555555555in"
-height="1.2638888888888888in"}
+![](./media/image79.png)
 
 Note: With the cluster restore all resources , including namespaces,
 pv's etc are restored
@@ -1693,89 +1602,72 @@ Restore a Point in Time Backup (Scheduled Backup)
 **Step** **14:** Delete the yelb, x1 , y1 and z1 namespaces which will
 delete the application and the associated PV's and other resources:
 
-kubectl delete ns yelb
+> kubectl delete ns yelb
 
-kubectl delete ns x1
+> kubectl delete ns x1
 
-kubectl delete ns y1
+> kubectl delete ns y1
 
-kubectl delete ns z1
+> kubectl delete ns z1
 
-![A screenshot of a cell phone Description automatically
-generated](./media/image80.png){width="4.152777777777778in"
-height="0.9166666666666666in"}
+![](./media/image80.png)
 
-kubectl get ns
+> kubectl get ns
 
-![A screenshot of a cell phone Description automatically
-generated](./media/image81.png){width="4.180555555555555in"
-height="1.0in"}
+![](./media/image81.png)
 
-**\
-**
 
 **Step 15:** Login to Minio, and copy the name of the backup that was
 created when a backup scheduler was created. Eg.
 daily-scheduler-20200609044342:
 
-![A screenshot of a cell phone Description automatically
-generated](./media/image82.png){width="7.5in"
-height="2.1430555555555557in"}
+![](./media/image82.png)
 
 **Step 15:** Restore the point in time backup to the cluster:
 
-cd \~/velero/velero-v1.4.0-linux-amd64
+> cd \~/velero/velero-v1.4.0-linux-amd64
 
-./velero restore create \--from-backup daily-scheduler-20200609044342
+> ./velero restore create \--from-backup daily-scheduler-20200609044342
 
-![](./media/image83.png){width="7.5in" height="0.2916666666666667in"}
+![](./media/image83.png)
 
 **Step 16:** Check the status of the restore:
 
 ./velero restore describe daily-scheduler-20200609044342-20200609061417
 
-![A screenshot of text Description automatically
-generated](./media/image84.png){width="7.221101268591426in"
-height="2.341176727909011in"}
+![](./media/image84.png)
 
 **Step 17:** Monitor the resources created in the target cluster. The
 yelb , x1, y1 and z1 namespaces should be created. Pods,pv's,
 deployments and services should also be created.
 
-kubectl get ns
-
-kubectl get po \--all-namespaces
-
-kubectl get pvc \--all-namespaces
-
-kubectl get svc \--all-namespaces
+> kubectl get ns
+>
+> kubectl get po \--all-namespaces
+>
+> kubectl get pvc \--all-namespaces
+>
+> kubectl get svc \--all-namespaces
 
 **Step 18:** Get the external ip for the yelb-ui app
 
-kubectl get svc -n yelb
+> kubectl get svc -n yelb
 
-![A screenshot of a cell phone Description automatically
-generated](./media/image85.png){width="4.819444444444445in"
-height="0.6805555555555556in"}
+![](./media/image85.png)
 
 **Step 19**: Point the browser to it,make sure all the data is visible
 in the application, and the application is reachable. Compare the voting
 data recorded in the table before the cluster backup was taken.
 
-![A screenshot of a cell phone Description automatically
-generated](./media/image86.png){width="6.15294072615923in"
-height="3.4684350393700787in"}
+![](./media/image86.png)
 
 **Step 20**: The x1, y1 and z1 namespaces run nginx pods with busybox.
 The nginx pod running in namespace x1 is exposed as a load balancer. Get
 the external ip to this pod and point the browser to access the service.
 
-![](./media/image87.png){width="4.680555555555555in"
-height="0.4444444444444444in"}
+![](./media/image87.png)
 
-![A screenshot of a cell phone Description automatically
-generated](./media/image88.png){width="7.222220034995625in"
-height="1.625in"}
+![](./media/image88.png)
 
 Note: With the cluster restore all resources , including namespaces,
 pv's etc are restored from a backup in time.
@@ -1785,14 +1677,15 @@ Cleanup
 
 **Step 1:** Get kube config for the source cluster
 
-pks get-kubeconfig \<source-cluster\> -a \<pks api\> -u \<user\> -p
-\<password\> -k
-
-E.g.
-
-pks get-kubeconfig ci-cluster -a pks.corp.local -u riaz -p VMware1! -k
-
-![](./media/image14.png){width="7.0in" height="0.8006944444444445in"}
+> pks login -a <pks api> -u <user> -p <password> -k
+> pks get-credentials <cluster>
+>
+> Alternatively
+> pks get-kubeconfig <cluster> -a <pks api> -u <user> -p <password> -k
+> E.g.
+> pks login -a pks.corp.local -u riaz -p VMware1! -k
+> pks get-credentials ci-cluster
+> pks get-kubeconfig ci-cluster -a pks.corp.local -u riaz -p VMware1! -k
 
 **Step 2:** Set kubectl context to the source cluster
 
@@ -1803,23 +1696,23 @@ kubectl config use-context \<source-cluster\>
 
 **Step 3:** Get all backup's taken from of a specific cluster
 
-./velero backup get
+> ./velero backup get
 
 **Step 4:** To delete a specific backup
 
-./velero backup delete \<backupname\>
+> ./velero backup delete \<backupname\>
 
-E.g.
+> E.g.
 
-./velero backup delete sourceclusterbk
+> ./velero backup delete sourceclusterbk
 
 **Step 4:** To delete all backups
 
-./velero backup delete \--all
+> ./velero backup delete \--all
 
 **Step 5:** To delete a backup schedule
 
-./velero schedule delete \<schedule-name\>
+> ./velero schedule delete \<schedule-name\>
 
 Conclusion
 ==========
