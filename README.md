@@ -400,14 +400,14 @@ if the PVC is created and bound
 > kubectl get pvc -n minio
 
 > kubectl get deployment -n minio 
-
+<br/>
 ![](./media/image4.png) 
-
+<br/>
 
 ![](./media/image5.png) 
- 
+ <br/>
 ![](./media/image6.png) 
-
+<br/>
 
 **Step 8:** Expose the deployment as a Load Balancer. This will create a
 lb within NSX-T as well as an ingress.
@@ -459,9 +459,8 @@ Velero Setup
 
 **Step 1:** Navigate to the official page of Velero
 (<https://github.com/vmware-tanzu/velero/releases>) and copy the link
-for the target VM (Virtual Machine) OS (operating systems). (Eg.
-<https://github.com/vmware-tanzu/velero/releases/tag/v1.4.0>). At the
-bottom of the page the official releases are listed, Right clink on the
+for the target VM (Virtual Machine) OS (operating systems). (Eg. <https://github.com/vmware-tanzu/velero/releases/tag/v1.4.0>). 
+At the bottom of the page the official releases are listed, Right clink on the
 release link 'Copy Link address'
 
 ![](./media/image13.png)
@@ -496,16 +495,21 @@ ci-cluster as our source cluster.
 **Step 2:** Get kube config for the source cluster:
 
 > pks login -a <pks api> -u <user> -p <password> -k
+>
 > pks get-credentials <cluster> 
-
-Alternatively 
+>
+> Alternatively 
 > pks get-kubeconfig \<source-cluster\> -a \<pks api\> -u \<user\> -p
 \<password\> -k
-
+>
 > E.g.
+> 
 > pks login -a pks.corp.local -u riaz -p VMware1! -k
+> 
 > pks get-credentials ci-cluster
-Alternatively
+>
+> Alternatively
+>
 > pks get-kubeconfig ci-cluster -a pks.corp.local -u riaz -p VMware1! -k
 
 ![](./media/image14.png)
@@ -522,9 +526,19 @@ Alternatively
 will contain the username and password used for Minio. The values would
 be the same as what was provided during the Minio setup.
 
-> \[default\]
-> aws\_access\_key\_id = minio
-> aws\_secret\_access\_key = minio123
+
+<details><summary>credentials</summary>
+
+```yaml
+---
+[default]
+aws_access_key_id = minio
+aws_secret_access_key = minio123
+
+```
+</details>
+<br/>
+
 
 Note: This file can be deleted once the Velero is installed to the
 cluster.
@@ -581,6 +595,7 @@ E.g.
 >
 > \--plugins velero/velero-plugin-for-aws:v1.1.0
 
+<br/>
 ![](./media/image15.png)
 
 **Step 8:** Get status of pods in the velero namespace
