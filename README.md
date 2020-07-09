@@ -400,14 +400,14 @@ if the PVC is created and bound
 > kubectl get pvc -n minio
 
 > kubectl get deployment -n minio 
-<br/>
+
 ![](./media/image4.png) 
-<br/>
+
 
 ![](./media/image5.png) 
- <br/>
+ 
 ![](./media/image6.png) 
-<br/>
+
 
 **Step 8:** Expose the deployment as a Load Balancer. This will create a
 lb within NSX-T as well as an ingress.
@@ -564,7 +564,7 @@ kubectl config use-context \<source-cluster\>
 >
 > \--backup-location-config
 > region=minio,s3ForcePathStyle=\"true\",s3Url=http://\<external-ip of
-> minio\>;\<port\> \\
+> minio\>:\<port\> \\
 >
 > \--snapshot-location-config region=minio \\
 >
@@ -595,7 +595,7 @@ E.g.
 >
 > \--plugins velero/velero-plugin-for-aws:v1.1.0
 
-<br/>
+
 ![](./media/image15.png)
 
 **Step 8:** Get status of pods in the velero namespace
@@ -606,7 +606,7 @@ E.g.
 the hostPath for the Restic pods.
 
 > kubectl edit daemonset restic -n velero
-
+> 
 change hostPath from /var/lib/kubelet/pods to
 > /var/vcap/data/kubelet/pods:
 
@@ -713,13 +713,18 @@ restored**.** As mentioned in the assumptions section we will be using
 
 > pks login -a <pks api> -u <user> -p <password> -k
 > pks get-credentials <cluster> 
-
-Alternatively
-> pks get-kubeconfig <cluster> -a <pks api> -u <user> -p <password> -k
-> E.g.
-> pks login -a pks.corp.local -u riaz -p VMware1! -k
-> pks get-credentials my-cluster
+>
 > Alternatively
+> pks get-kubeconfig <cluster> -a <pks api> -u <user> -p <password> -k
+>
+> E.g.
+>
+> pks login -a pks.corp.local -u riaz -p VMware1! -k
+>
+> pks get-credentials my-cluster
+>
+> Alternatively
+>
 > pks get-kubeconfig my-cluster -a pks.corp.local -u riaz -p VMware1! -k
 
 ![](./media/image20.png)
@@ -754,13 +759,19 @@ Deploy Yelb
 **Step 1:** Get kube config for the source cluster
 
 > pks login -a <pks api> -u <user> -p <password> -k
-> pks get-credentials <cluster>
+> pks get-credentials <cluster> 
 >
 > Alternatively
 > pks get-kubeconfig <cluster> -a <pks api> -u <user> -p <password> -k
+>
 > E.g.
+>
 > pks login -a pks.corp.local -u riaz -p VMware1! -k
+>
 > pks get-credentials ci-cluster
+>
+> Alternatively
+>
 > pks get-kubeconfig ci-cluster -a pks.corp.local -u riaz -p VMware1! -k
 
 ![](./media/image14.png)
@@ -777,54 +788,46 @@ Create a storage-class on the infra cluster with the following storage
 class definition. Copy the contents of the file below to a file
 storage-class.yaml and create the storage class.
 
-> \-\--
->
-> kind: StorageClass
->
-> apiVersion: storage.k8s.io/v1
->
-> metadata:
->
-> name: thin-disk
->
-> annotations:
->
-> storageclass.kubernetes.io/is-default-class: \"true\"
+<details><summary>storage-class.yaml</summary>
 
+```yaml
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  storageclass.kubernetes.io/is-default-class: "true"
+  name: minio-disk
 provisioner: kubernetes.io/vsphere-volume
+parameters:
+    diskformat: thin
+```
+</details>
+<br/>
 
-> parameters:
->
-> diskformat: thin
 
-NOTE: If setting up the storage class using the csi driver , follow the
+NOTE: If setting up the storage class using the CSI driver , follow the
 steps provided in the VMware Tanzu documentation to set up the CSI
 driver on the cluster you before creating the storage class.
 <https://docs.pivotal.io/pks/1-7/vsphere-cns.html>
 
 Storage class definition when using a CSI driver
 
-> \-\--
->
-> apiVersion: storage.k8s.io/v1
->
-> kind: StorageClass
->
-> metadata:
->
-> name: csi-sc
->
-> annotations:
->
-> storageclass.kubernetes.io/is-default-class: \"true\"
->
-> provisioner: csi.vsphere.vmware.com
->
-> parameters:
->
-> datastoreurl:
-> \"ds:///vmfs/volumes/5cef81a9-a9328547-8d05-00505601dfda/\"
->
+<details><summary>storage-class.yaml</summary>
+
+```yaml
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  storageclass.kubernetes.io/is-default-class: "true"
+  name: minio-disk
+provisioner: csi.vsphere.vmware.com
+parameters:
+  datastoreurl: "ds:///vmfs/volumes/5cef81a9-a9328547-8d05-00505601dfda/"
+```
+</details>
+<br/>
+
 Datastore url can be obtained from vcenter
 
 ![](./media/image3.png)
@@ -841,10 +844,7 @@ Datastore url can be obtained from vcenter
 application. This will create a PVC for the redis-server and the yelb-db
 database.
 
-Copy the contents of the file
-<https://github.com/riazvm/velerobackupandrestore/blob/master/application/yelb/yelb-pvc.yaml>
-
-to a local file for e.g. yelb-pvc.yaml
+Copy the contents of the file <https://github.com/riazvm/velerobackupandrestore/blob/master/application/yelb/yelb-pvc.yaml> to a local file for e.g. yelb-pvc.yaml
 
 > kubectl apply -f yelb-pvc.yaml
 
@@ -854,10 +854,7 @@ to a local file for e.g. yelb-pvc.yaml
 deployments, pods and services and expose the yelb-ui deployment as an
 ingress of type loadbalancer
 
-Copy the contents of the file
-<https://github.com/riazvm/velerobackupandrestore/blob/master/application/yelb/yelb.yaml>
-
-file to a local file for e.g. yelb.yaml
+Copy the contents of the file <https://github.com/riazvm/velerobackupandrestore/blob/master/application/yelb/yelb.yaml> to a local file for e.g. yelb.yaml
 
 > kubectl apply -f yelb.yaml
 
@@ -928,13 +925,19 @@ etc.
 **Step 1:** Get kube config for the source cluster
 
 > pks login -a <pks api> -u <user> -p <password> -k
-> pks get-credentials <cluster>
+> pks get-credentials <cluster> 
 >
 > Alternatively
 > pks get-kubeconfig <cluster> -a <pks api> -u <user> -p <password> -k
+>
 > E.g.
+>
 > pks login -a pks.corp.local -u riaz -p VMware1! -k
+>
 > pks get-credentials ci-cluster
+>
+> Alternatively
+>
 > pks get-kubeconfig ci-cluster -a pks.corp.local -u riaz -p VMware1! -k
 
 ![](./media/image14.png)
@@ -949,7 +952,7 @@ etc.
 
 **Step 3:** Check all resources running on the source cluster
 
-kubectl get ns
+> kubectl get ns
 
 ![](./media/image27.png)
 
@@ -1010,9 +1013,10 @@ The volumes associated with this pod is
 >
 >**mysql-persistent-storage:**
 >
->Type: PersistentVolumeClaim (a reference to a PersistentVolumeClaim in
->the same namespace)
+> Type: PersistentVolumeClaim (a reference to a PersistentVolumeClaim in the same namespace)
+>
 >    ClaimName: db-pv-claim
+> 
 >   ReadOnly: false
 
 ![](./media/image32.png)
@@ -1404,14 +1408,21 @@ complete unlike the backup process.
 
 **Step 1:** Get kube config for the source cluster
 
+
 > pks login -a <pks api> -u <user> -p <password> -k
-> pks get-credentials <cluster>
+> pks get-credentials <cluster> 
 >
 > Alternatively
 > pks get-kubeconfig <cluster> -a <pks api> -u <user> -p <password> -k
+>
 > E.g.
+>
 > pks login -a pks.corp.local -u riaz -p VMware1! -k
+>
 > pks get-credentials my-cluster
+>
+> Alternatively
+>
 > pks get-kubeconfig my-cluster -a pks.corp.local -u riaz -p VMware1! -k
 
 **Step 2:** Set kubectl context to the target cluster
@@ -1437,56 +1448,45 @@ following storage class definition.
 Copy the contents of the file below to a file storage-class.yaml and
 create the storage class.
 
-> \-\--
->
-> kind: StorageClass
->
-> apiVersion: storage.k8s.io/v1
->
-> metadata:\
-> storageclass.kubernetes.io/is-default-class: \"true\"
->
-> name: thin-disk
->
-> provisioner: kubernetes.io/vsphere-volume
->
-> parameters:
->
-> diskformat: thin
+<details><summary>storage-class.yaml</summary>
 
-> kubectl apply -f storage-class.yaml
+```yaml
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  storageclass.kubernetes.io/is-default-class: "true"
+  name: minio-disk
+provisioner: kubernetes.io/vsphere-volume
+parameters:
+    diskformat: thin
+```
+</details>
+<br/>
 
-> kubectl get sc
 
-![](./media/image63.png)
-
-NOTE: If setting up the storage class using the csi driver , follow the
+NOTE: If setting up the storage class using the CSI driver , follow the
 steps provided in the VMware Tanzu documentation to set up the CSI
 driver on the cluster you before creating the storage class.
 <https://docs.pivotal.io/pks/1-7/vsphere-cns.html>
 
 Storage class definition when using a CSI driver
 
-> \-\--
->
-> apiVersion: storage.k8s.io/v1
->
-> kind: StorageClass
->
-> metadata:
->
-> name: csi-sc
->
-> annotations:
->
-> storageclass.kubernetes.io/is-default-class: \"true\"
->
-> provisioner: csi.vsphere.vmware.com
->
-> parameters:
->
-> datastoreurl:
-> \"ds:///vmfs/volumes/5cef81a9-a9328547-8d05-00505601dfda/\"
+<details><summary>storage-class.yaml</summary>
+
+```yaml
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  storageclass.kubernetes.io/is-default-class: "true"
+  name: minio-disk
+provisioner: csi.vsphere.vmware.com
+parameters:
+  datastoreurl: "ds:///vmfs/volumes/5cef81a9-a9328547-8d05-00505601dfda/"
+```
+</details>
+<br/>
 
 > kubectl get sc
 
@@ -1545,7 +1545,7 @@ make sure all the data is visible in the application, and the
 application is reachable. Compare the voting data recorded in the table
 before the namespace backup was taken.
 
-kubectl get svc -n yelb
+> kubectl get svc -n yelb
 
 ![](./media/image69.png)
 
@@ -1659,7 +1659,7 @@ daily-scheduler-20200609044342:
 
 **Step 16:** Check the status of the restore:
 
-./velero restore describe daily-scheduler-20200609044342-20200609061417
+> ./velero restore describe daily-scheduler-20200609044342-20200609061417
 
 ![](./media/image84.png)
 
@@ -1704,18 +1704,24 @@ Cleanup
 **Step 1:** Get kube config for the source cluster
 
 > pks login -a <pks api> -u <user> -p <password> -k
-> pks get-credentials <cluster>
+> pks get-credentials <cluster> 
 >
 > Alternatively
 > pks get-kubeconfig <cluster> -a <pks api> -u <user> -p <password> -k
+>
 > E.g.
+>
 > pks login -a pks.corp.local -u riaz -p VMware1! -k
+>
 > pks get-credentials ci-cluster
+>
+> Alternatively
+>
 > pks get-kubeconfig ci-cluster -a pks.corp.local -u riaz -p VMware1! -k
 
 **Step 2:** Set kubectl context to the source cluster
 
-kubectl config use-context \<source-cluster\>
+> kubectl config use-context \<source-cluster\>
 
 > E.g.\
 > kubectl config use-context ci-cluster
