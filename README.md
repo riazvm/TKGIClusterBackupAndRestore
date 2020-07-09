@@ -333,15 +333,22 @@ Create a storage-class on the infra cluster with the following storage
 class definition. Copy the contents of the file below to a file
 storage-class.yaml and create the storage class.
 
-> \-\--
->
-> kind: StorageClass
-> apiVersion: storage.k8s.io/v1
-> metadata:
-> name: minio-disk
-> provisioner: kubernetes.io/vsphere-volume
-> parameters:
->   diskformat: thin
+<details><summary>storage-class.yaml</summary>
+
+```yaml
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  storageclass.kubernetes.io/is-default-class: "true"
+  name: minio-disk
+provisioner: kubernetes.io/vsphere-volume
+parameters:
+    diskformat: thin
+```
+</details>
+<br/>
+
 
 NOTE: If setting up the storage class using the CSI driver , follow the
 steps provided in the VMware Tanzu documentation to set up the CSI
@@ -350,27 +357,29 @@ driver on the cluster you before creating the storage class.
 
 Storage class definition when using a CSI driver
 
-> \-\--
->
-> apiVersion: storage.k8s.io/v1
-> kind: StorageClass
-> metadata:
->   name: minio-disk
->   annotations:
->
-> storageclass.kubernetes.io/is-default-class: \"true\"
->
-> provisioner: csi.vsphere.vmware.com
->
-> parameters:
->
-> datastoreurl: "ds:///vmfs/volumes/5cef81a9-a9328547-8d05-00505601dfda/\"
->
+<details><summary>storage-class.yaml</summary>
+
+```yaml
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  storageclass.kubernetes.io/is-default-class: "true"
+  name: minio-disk
+provisioner: csi.vsphere.vmware.com
+parameters:
+  datastoreurl: "ds:///vmfs/volumes/5cef81a9-a9328547-8d05-00505601dfda/\"
+```
+</details>
+<br/>
+
 Datastore url can be obtained from vCenter
 
 ![](./media/image3.png)
 
+>
 > kubectl apply -f storage-class.yaml
+>
 
 **Step 6:** Deploy the Bitnami Minio release. This will create the necessary resources to run Minio within the minio namespace
 
