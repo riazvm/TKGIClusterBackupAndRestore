@@ -1,0 +1,2 @@
+# TKGIClusterBackupAndRestore
+This document is a quick start guide for backing up a Tanzu Kubernetes Grid Integrated (TKGI, formerly known as Enterprise PKS) Kubernetes cluster and restoring it. This document will provide details on Valero backup software, installing Velero,  backing up an existing cluster, and restoring to the same or another target cluster. The cluster backup will include all Kubernetes (K8) resources as well as persistent volumes. 
