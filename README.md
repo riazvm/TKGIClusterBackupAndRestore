@@ -400,13 +400,16 @@ if the PVC is created and bound
 > kubectl get pvc -n minio
 
 > kubectl get deployment -n minio
-
+ <br> <br>
 ![](./media/image4.png)
+ <br> <br>
 
 ![](./media/image5.png)
+ <br> <br>
 
 ![](./media/image6.png)
-
+ <br> <br>
+ 
 **Step 8:** Expose the deployment as a Load Balancer. This will create a
 lb within NSX-T as well as an ingress.
 
