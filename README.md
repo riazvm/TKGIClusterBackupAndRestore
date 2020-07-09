@@ -431,9 +431,14 @@ when we install Velero to the clusters in the following steps:
 
 ![](./media/image10.png)
 
+
+
 ![](./media/image11.png) 
 
+
+
 ![](./media/image12.png)
+
 
 Minio Cleanup
 -------------
