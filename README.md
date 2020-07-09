@@ -369,8 +369,8 @@ Storage class definition when using a CSI driver
 > datastoreurl:
 > \"ds:///vmfs/volumes/5cef81a9-a9328547-8d05-00505601dfda/\"
 >
-> Datastore url can be obtained from vCenter
->
+Datastore url can be obtained from vCenter
+
 ![](./media/image3.png)
 
 > kubectl apply -f storage-class.yaml
@@ -389,61 +389,43 @@ mino which also requires space.
 everything is created and the pods are running as expected. Also check
 if the PVC is created and bound
 
-kubectl get all -n minio
+> kubectl get all -n minio
 
-kubectl get pvc -n minio
+> kubectl get pvc -n minio
 
-kubectl get deployment -n minio
+> kubectl get deployment -n minio
 
-![A close up of a sign Description automatically
-generated](./media/image4.png){width="7.5in"
-height="1.988888888888889in"}
+![](./media/image4.png)
 
-![](./media/image5.png){width="7.5in" height="0.39861111111111114in"}
+![](./media/image5.png)
 
-![A screenshot of a cell phone Description automatically
-generated](./media/image6.png){width="6.361110017497813in"
-height="0.8333333333333334in"}
+![](./media/image6.png)
 
 **Step 8:** Expose the deployment as a Load Balancer. This will create a
 lb within NSX-T as well as an ingress.
 
-> kubectl expose deployment minio-release \--name=minio-frontend-lb
-> \--port=80 \--target-port=9000 \--type=LoadBalancer \--namespace=minio
+> kubectl expose deployment minio-release --name=minio-frontend-lb --port=80 --target-port=9000 --type=LoadBalancer --namespace=minio
 
-**Step 9:** Check the IP under the "External-IP" section, point your
-browser to that IP address:port . The Minio application should be
-accessible
+**Step 9:** Check the IP under the "External-IP" section, point your browser to that IP address:port . The Minio application should be accessible
 
-![](./media/image7.png){width="7.5in" height="0.7111111111111111in"}
+![](./media/image7.png)
 
-![A screenshot of a computer Description automatically
-generated](./media/image8.png){width="4.7647058180227475in"
-height="2.7763232720909885in"}
+![](./media/image8.png)
 
 **Step 10:** Login with the credentials used in step 6. E.g.
 minio/minio123
 
-![A screenshot of a cell phone Description automatically
-generated](./media/image9.png){width="5.104763779527559in"
-height="2.8941174540682413in"}
+![](./media/image9.png)
 
-**\
-**
 
 **Step 11:** Create a bucket called Velero. We will be using this bucket
 when we install Velero to the clusters in the following steps:
 
-![A screenshot of a social media post Description automatically
-generated](./media/image10.png){width="5.470588363954506in"
-height="3.0442814960629923in"}
+![](./media/image10.png)
 
-![A screenshot of a cell phone Description automatically
-generated](./media/image11.png){width="7.5in" height="3.7875in"}
+![](./media/image11.png)
 
-![A screenshot of a social media post Description automatically
-generated](./media/image12.png){width="7.5in"
-height="3.183333333333333in"}
+![](./media/image12.png)
 
 Minio Cleanup
 -------------
@@ -469,9 +451,7 @@ for the target VM (Virtual Machine) OS (operating systems). (Eg.
 bottom of the page the official releases are listed, Right clink on the
 release link 'Copy Link address'
 
-![A screenshot of a social media post Description automatically
-generated](./media/image13.png){width="5.988234908136483in"
-height="3.54913823272091in"}
+![](./media/image13.png)
 
 **Step 2:** ssh to the provisioned ubuntu vm. (clivm)
 
