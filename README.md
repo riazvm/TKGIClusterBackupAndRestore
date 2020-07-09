@@ -301,8 +301,8 @@ setup Minio in a K8 cluster using the Bitnami distribution.
 
 **Step 2:** Get kube config for the infra cluster
 
->> pks login -a <pks api> -u <user> -p <password> -k
->> pks get-credentials infra-cluster 
+> pks login -a <pks api> -u <user> -p <password> -k
+> pks get-credentials <cluster> 
 
 Alternatively
 > pks get-kubeconfig <cluster> -a <pks api> -u <user> -p <password> -k
@@ -371,19 +371,13 @@ Storage class definition when using a CSI driver
 >
 > Datastore url can be obtained from vCenter
 >
-> ![A screenshot of a social media post Description automatically
-> generated](./media/image3.png){width="7.0in"
-> height="3.7916666666666665in"}
+![](./media/image3.png)
 
-kubectl apply -f storage-class.yaml
+> kubectl apply -f storage-class.yaml
 
-**Step 6:** Deploy the Bitnami Minio release. This will create the
-necessary resources to run Minio within the minio namespace
+**Step 6:** Deploy the Bitnami Minio release. This will create the necessary resources to run Minio within the minio namespace
 
-helm install minio-release -n minio \--set accessKey.password=minio
-\--set secretKey.password=minio123 \--set
-persistence.storageClass=minio-disk \--set persistence.size=128Gi
-bitnami/minio
+> helm install minio-release -n minio --set accessKey.password=minio --set secretKey.password=minio123 --set persistence.storageClass=minio-disk --set persistence.size=128Gi bitnami/minio
 
 NOTE: When sizing the storage for Minio, make sure there is about 3X
 times the storage the reason for which is minio stages the backup before
