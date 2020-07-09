@@ -2,7 +2,7 @@ VMware Advanced Customer Engagements (ACE) Team
 
 July 020
 
-Table of Contents {#table-of-contents .TOC-Heading}
+Table of Contents
 =================
 
 [Introduction 3](#introduction)
@@ -173,9 +173,6 @@ The **restore** operation allows you to restore all the objects and
 persistent volumes from a previously created backup. You can also
 restore only a filtered subset of objects and persistent volumes.
 
-**\
-**
-
 **Backup workflow**
 
 When you run Velero backup,
@@ -246,10 +243,10 @@ backed by virtual disks that reside on a datastore.
 This section defines the common use cases where Velero would be
 applicable.
 
-Cluster Migration**:** Migrate both stateful and stateless applications
+**Cluster Migration**: Migrate both stateful and stateless applications
 from one cluster to another
 
-Disaster Recovery**:** Restore applications (both stateful and
+**Disaster Recovery**: Restore applications (both stateful and
 stateless) to a cluster from a backup in time (scheduled backup)
 
 ![](./media/image2.png)
@@ -274,9 +271,6 @@ The following assumptions are made in the guide:
 
 -   The Minio backup endpoint is accessible from both the source and target clusters.
 
-```{=html}
-<!-- -->
-```
 -   A Linux/ubuntu machine is provisioned to install and use various software components
 
 -   The provisioned Linux/ubuntu machine meets the following
@@ -303,26 +297,28 @@ infrastructure cluster. We will be using the VMware Bitnami official
 opensource Minio Helm chart for K8s. The steps below describe how to
 setup Minio in a K8 cluster using the Bitnami distribution.
 
-**Step 1:** ssh to the provisioned ubuntu vm.
+**Step 1:** ssh to the provisioned ubuntu vm (clivm)
 
 **Step 2:** Get kube config for the infra cluster
 
-pks get-kubeconfig infra-cluster -a \<pks api\> -u \<user\> -p <password\> -k
+>> pks login -a <pks api> -u <user> -p <password> -k
+>> pks get-credentials infra-cluster 
 
-E.g.
+Alternatively
+> pks get-kubeconfig <cluster> -a <pks api> -u <user> -p <password> -k
+> E.g.
+> pks get-kubeconfig infra-cluster -a pks.corp.local -u riaz -p VMware1! -k
 
-pks get-kubeconfig infra-cluster -a pks.corp.local -u riaz -p VMware1!
--k
 
 **Step 3:** Create as namespace to which Minio can be deployed
 
-kubectl create ns minio
+> kubectl create ns minio
 
 **Step 4:** Add Bitnami Helm repository
 
-helm repo add bitnami <https://charts.bitnami.com/bitnami>
+> helm repo add bitnami <https://charts.bitnami.com/bitnami>
 
-helm repo update
+> helm repo update
 
 **Step 5:** Minio requires a backing store / K8s persistent volume.
 Create a storage-class on the infra cluster with the following storage
