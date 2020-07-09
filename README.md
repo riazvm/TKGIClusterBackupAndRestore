@@ -303,8 +303,8 @@ setup Minio in a K8 cluster using the Bitnami distribution.
 
 > pks login -a <pks api> -u <user> -p <password> -k
 > pks get-credentials <cluster> 
-
-Alternatively
+>
+> Alternatively
 > pks get-kubeconfig <cluster> -a <pks api> -u <user> -p <password> -k
 >
 > E.g.
