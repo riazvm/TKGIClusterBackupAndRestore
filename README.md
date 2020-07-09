@@ -264,10 +264,10 @@ The following assumptions are made in the guide:
     infrastructure applications like Minio and Prometheus will be
     running .
 
-> NOTE: This is not a fixed rule, Minio can run on any cluster,
-> including the source and the target cluster, it could also be run on a
-> standalone vm. For more information on Minio visit
-> [*https://docs.min.io/*](https://docs.min.io/)
+NOTE: This is not a fixed rule, Minio can run on any cluster,
+including the source and the target cluster, it could also be run on a
+standalone vm. For more information on Minio visit
+[*https://docs.min.io/*](https://docs.min.io/)
 
 -   The Minio backup endpoint is accessible from both the source and target clusters.
 
@@ -306,10 +306,15 @@ setup Minio in a K8 cluster using the Bitnami distribution.
 
 Alternatively
 > pks get-kubeconfig <cluster> -a <pks api> -u <user> -p <password> -k
+>
 > E.g.
+>
 > pks login -a pks.corp.local -u riaz -p VMware1! -k
+>
 > pks get-credentials infra-cluster
+>
 > Alternatively
+>
 > pks get-kubeconfig infra-cluster -a pks.corp.local -u riaz -p VMware1! -k
 
 
@@ -331,18 +336,12 @@ storage-class.yaml and create the storage class.
 > \-\--
 >
 > kind: StorageClass
->
 > apiVersion: storage.k8s.io/v1
->
 > metadata:
->
 > name: minio-disk
->
 > provisioner: kubernetes.io/vsphere-volume
->
 > parameters:
->
-> diskformat: thin
+>   diskformat: thin
 
 NOTE: If setting up the storage class using the CSI driver , follow the
 steps provided in the VMware Tanzu documentation to set up the CSI
@@ -354,14 +353,10 @@ Storage class definition when using a CSI driver
 > \-\--
 >
 > apiVersion: storage.k8s.io/v1
->
 > kind: StorageClass
->
 > metadata:
->
-> name: minio-disk
->
-> annotations:
+>   name: minio-disk
+>   annotations:
 >
 > storageclass.kubernetes.io/is-default-class: \"true\"
 >
