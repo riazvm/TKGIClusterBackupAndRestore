@@ -368,7 +368,7 @@ metadata:
   name: minio-disk
 provisioner: csi.vsphere.vmware.com
 parameters:
-  datastoreurl: "ds:///vmfs/volumes/5cef81a9-a9328547-8d05-00505601dfda/\"
+  datastoreurl: "ds:///vmfs/volumes/5cef81a9-a9328547-8d05-00505601dfda/"
 ```
 </details>
 <br/>
@@ -399,14 +399,14 @@ if the PVC is created and bound
 
 > kubectl get pvc -n minio
 
-> kubectl get deployment -n minio \
+> kubectl get deployment -n minio 
 
-![](./media/image4.png) \
+![](./media/image4.png) 
 
 
-![](./media/image5.png) \
+![](./media/image5.png) 
  
-![](./media/image6.png) \
+![](./media/image6.png) 
 
 
 **Step 8:** Expose the deployment as a Load Balancer. This will create a
@@ -426,12 +426,12 @@ minio/minio123
 ![](./media/image9.png)
 
 
-**Step 11:** Create a bucket called Velero. We will be using this bucket
+**Step 11:** Create a bucket called Velero. We will be using this 
 when we install Velero to the clusters in the following steps:
 
 ![](./media/image10.png)
 
-![](./media/image11.png)
+![](./media/image11.png) 
 
 ![](./media/image12.png)
 
