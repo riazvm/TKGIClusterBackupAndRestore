@@ -844,7 +844,7 @@ Datastore url can be obtained from vcenter
 application. This will create a PVC for the redis-server and the yelb-db
 database.
 
-Copy the contents of the file <https://github.com/riazvm/velerobackupandrestore/blob/master/application/yelb/yelb-pvc.yaml> to a local file for e.g. yelb-pvc.yaml
+Copy the contents of the file <https://github.com/riazvm/TKGIClusterBackupAndRestore/tree/master/yelb/yelb-pvc.yaml> to a local file for e.g. yelb-pvc.yaml
 
 > kubectl apply -f yelb-pvc.yaml
 
@@ -854,7 +854,7 @@ Copy the contents of the file <https://github.com/riazvm/velerobackupandrestore/
 deployments, pods and services and expose the yelb-ui deployment as an
 ingress of type loadbalancer
 
-Copy the contents of the file <https://github.com/riazvm/velerobackupandrestore/blob/master/application/yelb/yelb.yaml> to a local file for e.g. yelb.yaml
+Copy the contents of the file <https://github.com/riazvm/TKGIClusterBackupAndRestore/tree/master/yelb/yelb.yaml> to a local file for e.g. yelb.yaml
 
 > kubectl apply -f yelb.yaml
 
