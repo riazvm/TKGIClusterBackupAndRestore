@@ -65,13 +65,17 @@ spec:
     app: yelb-ui
     tier: frontend
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: yelb-ui
   namespace: yelb
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: yelb-ui
+      tier: frontend
   template:
     metadata:
       labels:
@@ -84,7 +88,7 @@ spec:
         ports:
         - containerPort: 80
 ---
-apiVersion: apps/v1beta2
+apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: redis-server
@@ -114,7 +118,7 @@ spec:
         persistentVolumeClaim:
           claimName: redis-pv-claim
 ---
-apiVersion: apps/v1beta2
+apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: yelb-db
@@ -147,13 +151,17 @@ spec:
         persistentVolumeClaim:
           claimName: db-pv-claim
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: yelb-appserver
   namespace: yelb
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: yelb-appserver
+      tier: middletier     
   template:
     metadata:
       labels:
